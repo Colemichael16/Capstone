@@ -7,6 +7,7 @@ nearest help.
 ## What's here
 
 ```
+ios/CUAlerts.xcodeproj/          open this — do NOT File → Open the CUAlerts/ folder directly
 ios/CUAlerts/
   App/CUAlertsApp.swift          entry point, wires up stores
   Models/                        Report, Incident, ReportCategory
@@ -25,21 +26,16 @@ ios/CUAlerts/
     DirectionsView.swift         emergency route + campus destination picker
 ```
 
-This is source-only — there's no `.xcodeproj` yet. Create one and drop these
-files in:
+Open **`ios/CUAlerts.xcodeproj`** directly (double-click it, or `open
+ios/CUAlerts.xcodeproj` from Terminal) and build. Don't use **File → Open**
+on the `CUAlerts/` source folder itself — Xcode will treat it as a loose
+folder with no real target ("Files.xcfilescontainer"), which isn't
+buildable.
 
-1. In Xcode: **File → New → Project → iOS → App**, name it `CUAlerts`,
-   interface **SwiftUI**, minimum deployment target **iOS 17** (the map code
-   uses the iOS 17 `Map(position:)` / `MapReader` APIs).
-2. Delete the template's `ContentView.swift` / `App.swift`, then drag the
-   `App/`, `Models/`, `Data/`, `Services/`, `Stores/`, and `Views/` folders
-   from `ios/CUAlerts/` into the project (check "Copy items if needed" and
-   add to the app target).
-3. Add these keys to `Info.plist` (required — the app crashes on location
-   requests without them):
-   - `NSLocationWhenInUseUsageDescription` — e.g. "Used to show your
-     position on the campus map and calculate walking directions."
-4. Build & run on a simulator or device.
+The project targets **iOS 17** (the map code uses the iOS 17
+`Map(position:)` / `MapReader` APIs) and already has
+`NSLocationWhenInUseUsageDescription` set via the generated Info.plist —
+nothing else to configure. Pick a simulator or device and hit Run.
 
 ## How the report → incident pipeline works
 
