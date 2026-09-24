@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "campus-alert/alert.schema.json",
+  "title": "Alert",
+  "description": "The alert contract shared by db/, web/ and ios/. Mirrors the alerts table and uses CAP vocabulary for status and severity. DRAFT until the week-2 freeze; after that, change only by a PR touching all three.",
+  "type": "object",
+  "required": [
+    "id",
+    "status",
+    "category",
+    "severity",
+    "headline",
+    "short_message",
+    "center",
+    "radius_m",
+    "issued_at",
+    "expires_at"
+  ],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "status": { "$ref": "#/$defs/status" },
+    "category": { "$ref": "#/$defs/category" },
+    "severity": { "$ref": "#/$defs/severity" },
+    "headline": { "type": "string", "maxLength": 60, "description": "Notification title" },
+    "short_message": { "type": "string", "maxLength": 160, "description": "Notification body" },
+    "full_details": { "type": ["string", "null"], "description": "Shown on pin tap" },
+    "instructions": { "type": ["string", "null"], "description": "What to do / what to avoid" },
+    "center": { "$ref": "#/$defs/point" },
+    "radius_m": { "type": "integer", "minimum": 1 },
+    "issued_by": { "type": ["string", "null"], "format": "uuid" },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "status": { "enum": ["draft", "active", "updated", "resolved", "cancelled"] },
+    "category": {
+      "enum": ["active_threat", "fire", "weather", "hazmat", "police", "utility", "protest", "medical"]
+    },
+    "severity": { "enum": ["extreme", "severe", "moderate", "minor"] },
+    "point": {
+      "description": "GeoJSON Point, [longitude, latitude]. PostgREST returns geography as EWKB hex, so serve alerts through a view or RPC using ST_AsGeoJSON(center).",
+      "type": "object",
+      "required": ["type", "coordinates"],
+      "properties": {
+        "type": { "const": "Point" },
+        "coordinates": {
+          "type": "array",
+          "prefixItems": [{ "type": "number" }, { "type": "number" }],
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    }
+  }
+}

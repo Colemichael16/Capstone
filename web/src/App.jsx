@@ -1,122 +1,82 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useEffect, useMemo, useState } from 'react'
+import { isActive } from './alerts/contract.js'
+import { EMPTY_DRAFT, draftToAlert } from './alerts/draft.js'
+import { sampleAlerts } from './alerts/sampleAlerts.js'
+import AlertMap from './components/AlertMap.jsx'
+import Composer from './components/Composer.jsx'
+import ConfirmPublish from './components/ConfirmPublish.jsx'
+import Dashboard from './components/Dashboard.jsx'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+// Re-render periodically so expired alerts clear off the map on their own
+function useNow(intervalMs) {
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), intervalMs)
+    return () => clearInterval(id)
+  }, [intervalMs])
+  return now
 }
 
-export default App
+export default function App() {
+  const [alerts, setAlerts] = useState(sampleAlerts)
+  const [view, setView] = useState('dashboard') // dashboard | compose | confirm
+  const [draft, setDraft] = useState(EMPTY_DRAFT)
+  const [selectedId, setSelectedId] = useState(null)
+  const now = useNow(30_000)
+  const activeAlerts = useMemo(() => alerts.filter((a) => isActive(a, now)), [alerts, now])
+
+  // TODO: replace with a Supabase insert; Realtime then delivers the row to the iOS app
+  const publish = () => {
+    const alert = draftToAlert(draft)
+    setAlerts((prev) => [alert, ...prev])
+    setDraft(EMPTY_DRAFT)
+    setSelectedId(alert.id)
+    setView('dashboard')
+  }
+
+  const cancelDraft = () => {
+    setDraft(EMPTY_DRAFT)
+    setView('dashboard')
+  }
+
+  return (
+    <div className="app">
+      <header className="topbar">
+        <span className="brand">Campus Alert</span>
+        <span className="subtitle">Office of Safety · Dispatcher</span>
+      </header>
+
+      <aside className="panel">
+        {view === 'dashboard' && (
+          <Dashboard
+            alerts={activeAlerts}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onNewAlert={() => {
+              setSelectedId(null)
+              setView('compose')
+            }}
+          />
+        )}
+        {view === 'compose' && (
+          <Composer draft={draft} onChange={setDraft} onCancel={cancelDraft} onReview={() => setView('confirm')} />
+        )}
+        {view === 'confirm' && (
+          <ConfirmPublish draft={draft} onBack={() => setView('compose')} onPublish={publish} />
+        )}
+      </aside>
+
+      <main className="map-wrap">
+        <AlertMap
+          alerts={activeAlerts}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          draft={view === 'dashboard' ? null : draft}
+          picking={view === 'compose'}
+          onPick={(center) => setDraft((d) => ({ ...d, center }))}
+        />
+      </main>
+    </div>
+  )
+}
