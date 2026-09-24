@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { INITIAL_VIEW, MAPBOX_TOKEN, MAP_STYLE } from '../config.js'
-import { SEVERITIES, SEVERITY_COLORS, SEVERITY_LABELS } from '../alerts/contract.js'
+import { SEVERITIES, SEVERITY_COLORS } from '../alerts/contract.js'
 import { circlePolygon, polygonBounds } from '../alerts/geo.js'
 
 const EMPTY = { type: 'FeatureCollection', features: [] }
@@ -22,8 +22,7 @@ function toFeatures(alert, extra = {}) {
   const properties = {
     id: alert.id,
     severity: alert.severity,
-    // Severity is spelled out on the map so it is never conveyed by color alone
-    label: SEVERITY_LABELS[alert.severity].toUpperCase(),
+    label: alert.headline,
     ...extra,
   }
   return [
@@ -32,6 +31,8 @@ function toFeatures(alert, extra = {}) {
   ]
 }
 
+// The style is built on Mapbox Standard, whose 3D lights would otherwise shade these
+// layers; emissive-strength 1 keeps severity colors true
 function addLayers(map) {
   map.addSource('alerts', { type: 'geojson', data: EMPTY })
   map.addSource('draft', { type: 'geojson', data: EMPTY })
@@ -41,7 +42,7 @@ function addLayers(map) {
     type: 'fill',
     source: 'alerts',
     filter: isArea,
-    paint: { 'fill-color': severityColor, 'fill-opacity': 0.18 },
+    paint: { 'fill-color': severityColor, 'fill-opacity': 0.18, 'fill-emissive-strength': 1 },
   })
   map.addLayer({
     id: 'alert-outline',
@@ -51,6 +52,7 @@ function addLayers(map) {
     paint: {
       'line-color': severityColor,
       'line-width': ['case', ['get', 'selected'], 3.5, 1.5],
+      'line-emissive-strength': 1,
     },
   })
   map.addLayer({
@@ -58,14 +60,19 @@ function addLayers(map) {
     type: 'fill',
     source: 'draft',
     filter: isArea,
-    paint: { 'fill-color': severityColor, 'fill-opacity': 0.25 },
+    paint: { 'fill-color': severityColor, 'fill-opacity': 0.25, 'fill-emissive-strength': 1 },
   })
   map.addLayer({
     id: 'draft-outline',
     type: 'line',
     source: 'draft',
     filter: isArea,
-    paint: { 'line-color': severityColor, 'line-width': 2.5, 'line-dasharray': [2, 1.5] },
+    paint: {
+      'line-color': severityColor,
+      'line-width': 2.5,
+      'line-dasharray': [2, 1.5],
+      'line-emissive-strength': 1,
+    },
   })
   for (const source of ['alerts', 'draft']) {
     map.addLayer({
@@ -78,6 +85,7 @@ function addLayers(map) {
         'circle-radius': ['case', ['get', 'selected'], 10, 8],
         'circle-stroke-color': '#fff',
         'circle-stroke-width': 2.5,
+        'circle-emissive-strength': 1,
       },
     })
     map.addLayer({
@@ -88,13 +96,18 @@ function addLayers(map) {
       layout: {
         'text-field': ['get', 'label'],
         'text-font': ['DIN Pro Bold', 'Arial Unicode MS Bold'],
-        'text-size': 11,
-        'text-letter-spacing': 0.08,
+        'text-size': 12,
+        'text-max-width': 12,
         'text-offset': [0, 1.4],
         'text-anchor': 'top',
         'text-allow-overlap': true,
       },
-      paint: { 'text-color': severityColor, 'text-halo-color': '#fff', 'text-halo-width': 1.5 },
+      paint: {
+        'text-color': severityColor,
+        'text-halo-color': '#fff',
+        'text-halo-width': 1,
+        'text-emissive-strength': 1,
+      },
     })
   }
 }

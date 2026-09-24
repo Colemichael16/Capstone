@@ -15,6 +15,9 @@ export const CATEGORY_LABELS = {
   utility: 'Utility outage',
   protest: 'Protest',
   medical: 'Medical',
+  gathering: 'Public Gathering',
+  flooding: 'Flooding',
+  wildlife: 'Wildlife',
 }
 
 export const SEVERITY_LABELS = {
