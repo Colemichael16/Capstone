@@ -7,8 +7,8 @@ nearest help.
 ## What's here
 
 ```
-ios/CUAlerts.xcodeproj/          open this — do NOT File → Open the CUAlerts/ folder directly
-ios/CUAlerts/
+ios/CUAlerts.xcodeproj/          the project — open this one
+ios/Sources/
   App/CUAlertsApp.swift          entry point, wires up stores
   Models/                        Report, Incident, ReportCategory
   Data/CampusLocations.swift     seed campus landmarks + emergency resources
@@ -26,11 +26,12 @@ ios/CUAlerts/
     DirectionsView.swift         emergency route + campus destination picker
 ```
 
-Open **`ios/CUAlerts.xcodeproj`** directly (double-click it, or `open
-ios/CUAlerts.xcodeproj` from Terminal) and build. Don't use **File → Open**
-on the `CUAlerts/` source folder itself — Xcode will treat it as a loose
-folder with no real target ("Files.xcfilescontainer"), which isn't
-buildable.
+Open **`ios/CUAlerts.xcodeproj`** directly. In Finder, double-click it, or
+from Terminal: `open ios/CUAlerts.xcodeproj`. Don't use Xcode's **File →
+Open** dialog on a folder (`Capstone`, `ios`, or `Sources`) — Xcode treats a
+plain folder as a loose file browser with no real target ("Files
+.xcfilescontainer"), which isn't buildable. Only opening the `.xcodeproj`
+item itself gives you a real project.
 
 The project targets **iOS 17** (the map code uses the iOS 17
 `Map(position:)` / `MapReader` APIs) and already has

@@ -111,7 +111,7 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		19685DA716B94E5DA2AF8569 /* CUAlerts */ = {
+		19685DA716B94E5DA2AF8569 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
 				F30F736F4B404834918A5DC6 /* App */,
@@ -121,7 +121,7 @@
 				A2BF6432B7E446A1B1273CFD /* Stores */,
 				A8B2120BAD644AE794767833 /* Views */,
 			);
-			path = CUAlerts;
+			path = Sources;
 			sourceTree = "<group>";
 		};
 		F710E0A28A3B4094A730F6E4 /* Products */ = {
@@ -135,7 +135,7 @@
 		E4CC919E0DEF4978BA706799 = {
 			isa = PBXGroup;
 			children = (
-				19685DA716B94E5DA2AF8569 /* CUAlerts */,
+				19685DA716B94E5DA2AF8569 /* Sources */,
 				F710E0A28A3B4094A730F6E4 /* Products */,
 			);
 			sourceTree = "<group>";
