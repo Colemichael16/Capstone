@@ -10,7 +10,11 @@ protocol ReportRepository {
 }
 
 actor InMemoryReportRepository: ReportRepository {
-    private var reports: [Report] = []
+    private var reports: [Report]
+
+    init(seed: [Report] = Report.sampleData) {
+        reports = seed
+    }
 
     func fetchAll() async -> [Report] {
         reports

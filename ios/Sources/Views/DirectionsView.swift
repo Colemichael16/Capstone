@@ -85,7 +85,6 @@ struct DirectionsView: View {
                     }
                 }
             }
-            .navigationTitle("Directions")
         }
     }
 

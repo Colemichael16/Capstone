@@ -9,21 +9,34 @@ nearest help.
 ```
 ios/CUAlerts.xcodeproj/          the project — open this one
 ios/Sources/
-  App/CUAlertsApp.swift          entry point, wires up stores
-  Models/                        Report, Incident, ReportCategory
-  Data/CampusLocations.swift     seed campus landmarks + emergency resources
+  App/
+    CUAlertsApp.swift            entry point, wires up stores + repository choice
+    AppConfig.swift              useRemoteBackend toggle, API base URL
+  Models/                        Report, Incident, ReportCategory, User
+  Data/
+    CampusLocations.swift        seed campus landmarks + emergency resources
+    SampleData.swift             seed reports so the map isn't empty on first launch
   Services/
     IncidentClusterer.swift      groups nearby/recent reports into an Incident
-    ReportRepository.swift       storage boundary (in-memory now, swap for a real backend later)
+    ReportRepository.swift       storage boundary: InMemoryReportRepository (default)
+    RemoteReportRepository.swift storage boundary: talks to db/ instead
+    APIClient.swift               generic JSON client for db/ (see shared/api-contract.md)
+    AuthService.swift             /api/auth/* calls
+    JSONCoding+API.swift          date decoding that matches the backend's timestamp format
+    KeychainStore.swift           persists the auth session across launches
     LocationManager.swift        CLLocationManager wrapper
     DirectionsService.swift      MKDirections walking-route wrapper
-  Stores/ReportStore.swift       observable app state: reports + derived incidents
+  Stores/
+    ReportStore.swift            observable app state: reports + derived incidents
+    AuthStore.swift               observable session state: current user, login/register/logout
   Views/
-    ContentView.swift            tab bar: Map / Directions
+    RootView.swift                shows LoginView or ContentView depending on auth state
+    ContentView.swift            tab bar: Map / Directions (+ Account, if useRemoteBackend)
     CampusMapView.swift          the map, long-press to file a report
     ReportSheetView.swift        report form
     IncidentDetailView.swift     incident detail sheet
     DirectionsView.swift         emergency route + campus destination picker
+    LoginView.swift / SignUpView.swift / AccountView.swift
 ```
 
 Open **`ios/CUAlerts.xcodeproj`** directly. In Finder, double-click it, or
@@ -61,13 +74,40 @@ nothing else to configure. Pick a simulator or device and hit Run.
 - Routing uses `MKDirections` with `transportType = .walking`, returns a
   drawn polyline plus a step list.
 
+## Connecting to the real backend
+
+By default the app runs **standalone**: `AppConfig.useRemoteBackend` is
+`false`, so it uses `InMemoryReportRepository` seeded with
+`Report.sampleData` and skips login entirely — this is what you get out of
+the box, no server required.
+
+To use the real `db/` backend instead:
+
+1. Run the backend (`cd db && npm install && npm start` — see
+   `db/README.md`).
+2. Flip `AppConfig.useRemoteBackend` to `true` in
+   `ios/Sources/App/AppConfig.swift`.
+3. Build and run. You'll land on `LoginView` first — registration requires
+   a `@colorado.edu` email (see `shared/api-contract.md`); once signed in,
+   reports are fetched from and filed against the real server, and a third
+   **Account** tab appears with a sign-out button.
+
+The Simulator can reach `http://localhost:3000` directly. On a physical
+device, point `AppConfig.apiBaseURL` at your Mac's LAN IP instead of
+`localhost`.
+
+Everything in `Services/` and `Stores/AuthStore.swift` talks to the
+contract in **`../shared/api-contract.md`** — that's the source of truth
+for every route and field shape.
+
 ## Known gaps / next steps
 
-- All data is in-memory and resets on relaunch. `ReportRepository` is a
-  protocol specifically so a networked implementation can be swapped in
-  once there's a backend in `db/` — nothing else in the app needs to change.
-- Reports are unauthenticated and unmoderated; there's no abuse/spam
-  protection yet.
+- Reports are unmoderated once filed — auth only proves the submitter is a
+  real CU student, it doesn't prevent spam or false reports.
+- Incident clustering still runs client-side only, against whatever
+  `GET /api/reports` returns (see "Known gaps" in `db/README.md` — moving
+  it server-side is the next step there).
+- No password reset, account deletion, or email verification flow yet.
 - Routing doesn't currently avoid areas with active incidents — worth
   adding once there's a real routing backend, since `MKDirections` doesn't
   support custom avoidance zones on its own.
