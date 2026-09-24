@@ -12,6 +12,7 @@
 		585B4E56F4FA447F925EA0C2 /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F4302E3B9D4A599C158A4C /* Report.swift */; };
 		6430555450864140AF424218 /* ReportCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AEC6F9A6DE41658211BFB3 /* ReportCategory.swift */; };
 		3338EDD803C54F87A15BE184 /* CampusLocations.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28AC2A1E313486FA34EE6A1 /* CampusLocations.swift */; };
+		AF53667291B44119B7EE48D3 /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA2F213393D84D61BDF7D303 /* SampleData.swift */; };
 		0177C2F618F44505A1788D1A /* DirectionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAC75A7B53545EE94DFDA2E /* DirectionsService.swift */; };
 		0DBBFB9CA89145A9B91609DB /* IncidentClusterer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D830DEB8EA4D97877646CA /* IncidentClusterer.swift */; };
 		D808FE22734B46DABC8736E1 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22C926D73EE54D80BFEEBBEF /* LocationManager.swift */; };
@@ -31,6 +32,7 @@
 		B8F4302E3B9D4A599C158A4C /* Report.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
 		18AEC6F9A6DE41658211BFB3 /* ReportCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportCategory.swift; sourceTree = "<group>"; };
 		F28AC2A1E313486FA34EE6A1 /* CampusLocations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CampusLocations.swift; sourceTree = "<group>"; };
+		CA2F213393D84D61BDF7D303 /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
 		9EAC75A7B53545EE94DFDA2E /* DirectionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionsService.swift; sourceTree = "<group>"; };
 		B2D830DEB8EA4D97877646CA /* IncidentClusterer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncidentClusterer.swift; sourceTree = "<group>"; };
 		22C926D73EE54D80BFEEBBEF /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				F28AC2A1E313486FA34EE6A1 /* CampusLocations.swift */,
+				CA2F213393D84D61BDF7D303 /* SampleData.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -213,6 +216,7 @@
 				585B4E56F4FA447F925EA0C2 /* Report.swift in Sources */,
 				6430555450864140AF424218 /* ReportCategory.swift in Sources */,
 				3338EDD803C54F87A15BE184 /* CampusLocations.swift in Sources */,
+				AF53667291B44119B7EE48D3 /* SampleData.swift in Sources */,
 				0177C2F618F44505A1788D1A /* DirectionsService.swift in Sources */,
 				0DBBFB9CA89145A9B91609DB /* IncidentClusterer.swift in Sources */,
 				D808FE22734B46DABC8736E1 /* LocationManager.swift in Sources */,

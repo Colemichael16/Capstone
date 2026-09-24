@@ -49,7 +49,6 @@ struct CampusMapView: View {
                         }
                 )
             }
-            .navigationTitle("CU Boulder Alerts")
             .sheet(item: $selectedIncident) { incident in
                 IncidentDetailView(incident: incident)
             }
