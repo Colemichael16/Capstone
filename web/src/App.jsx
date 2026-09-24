@@ -43,7 +43,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <span className="brand">Campus Alert</span>
+        <span className="brand">ReagentWatch</span>
         <span className="subtitle">Office of Safety · Dispatcher</span>
       </header>
 
