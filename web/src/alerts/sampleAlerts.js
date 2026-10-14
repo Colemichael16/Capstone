@@ -1,4 +1,4 @@
-// Stand-in data until Supabase and db/seed/scenarios.sql exist. These are the
+// Offline stand-in, used only when Supabase env vars are not set. These are the
 // plan's three demo scenarios; coordinates are approximate.
 const hoursFromNow = (h) => new Date(Date.now() + h * 3600_000).toISOString()
 

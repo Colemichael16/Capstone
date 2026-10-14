@@ -6,7 +6,7 @@ import SeverityBadge from './SeverityBadge.jsx'
 const CONFIRM_WORD = 'PUBLISH'
 
 // Deliberate friction: accidental sends are the top real-world failure of alert systems
-export default function ConfirmPublish({ draft, onBack, onPublish }) {
+export default function ConfirmPublish({ draft, onBack, onPublish, publishing = false, error = null }) {
   const [typed, setTyped] = useState('')
   const confirmed = typed.trim() === CONFIRM_WORD
 
@@ -15,7 +15,7 @@ export default function ConfirmPublish({ draft, onBack, onPublish }) {
       className="confirm"
       onSubmit={(e) => {
         e.preventDefault()
-        if (confirmed) onPublish()
+        if (confirmed && !publishing) onPublish()
       }}
     >
       <h2>Review and publish</h2>
@@ -57,12 +57,18 @@ export default function ConfirmPublish({ draft, onBack, onPublish }) {
         <input value={typed} onChange={(e) => setTyped(e.target.value)} autoComplete="off" autoFocus />
       </label>
 
+      {error && (
+        <p className="warning" role="alert">
+          {error}
+        </p>
+      )}
+
       <div className="actions">
-        <button type="button" className="secondary" onClick={onBack}>
+        <button type="button" className="secondary" onClick={onBack} disabled={publishing}>
           ← Edit
         </button>
-        <button type="submit" className="danger" disabled={!confirmed}>
-          Publish alert
+        <button type="submit" className="danger" disabled={!confirmed || publishing}>
+          {publishing ? 'Publishing…' : 'Publish alert'}
         </button>
       </div>
     </form>

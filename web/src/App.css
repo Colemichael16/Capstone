@@ -21,6 +21,13 @@
 .subtitle {
   color: var(--text-muted);
 }
+.account {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+}
 
 .panel {
   overflow-y: auto;
