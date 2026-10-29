@@ -8,18 +8,12 @@ struct ContentView: View {
 
             DirectionsView()
                 .tabItem { Label("Directions", systemImage: "arrow.triangle.turn.up.right.diamond.fill") }
-
-            if AppConfig.useRemoteBackend {
-                AccountView()
-                    .tabItem { Label("Account", systemImage: "person.circle.fill") }
-            }
         }
     }
 }
 
 #Preview {
     ContentView()
-        .environmentObject(ReportStore())
+        .environmentObject(AlertStore())
         .environmentObject(LocationManager())
-        .environmentObject(AuthStore())
 }

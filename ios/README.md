@@ -1,8 +1,9 @@
 # CU Alerts (iOS)
 
-SwiftUI prototype: a campus map where enough reports near the same spot
-turn into a visible incident, plus emergency walking directions to the
-nearest help.
+SwiftUI client for the dispatcher alert system: campus staff publish
+official alerts from the web app (`web/`), and this app shows them on a
+live campus map plus gives walking directions across campus. iOS never
+creates or edits an alert — that's the web dispatcher's job.
 
 ## What's here
 
@@ -10,33 +11,24 @@ nearest help.
 ios/CUAlerts.xcodeproj/          the project — open this one
 ios/Sources/
   App/
-    CUAlertsApp.swift            entry point, wires up stores + repository choice
-    AppConfig.swift              useRemoteBackend toggle, API base URL
-  Models/                        Report, Incident, ReportCategory, User
+    CUAlertsApp.swift            entry point, wires up stores
+    SupabaseConfig.swift         Supabase URL/key — blank by default (offline mode)
+  Models/
+    Alert.swift                  CampusAlert + its enums, matches shared/alert.schema.json
   Data/
-    CampusLocations.swift        seed campus landmarks + emergency resources
-    SampleData.swift             seed reports so the map isn't empty on first launch
+    CampusLocations.swift        seed campus landmarks + emergency resources (for Directions)
+    SampleAlerts.swift           offline demo alerts, mirrors web/src/alerts/sampleAlerts.js
   Services/
-    IncidentClusterer.swift      groups nearby/recent reports into an Incident
-    ReportRepository.swift       storage boundary: InMemoryReportRepository (default)
-    RemoteReportRepository.swift storage boundary: talks to db/ instead
-    APIClient.swift               generic JSON client for db/ (see shared/api-contract.md)
-    AuthService.swift             /api/auth/* calls
-    JSONCoding+API.swift          date decoding that matches the backend's timestamp format
-    KeychainStore.swift           persists the auth session across launches
+    AlertRepository.swift        OfflineAlertRepository + SupabaseAlertRepository (alerts_feed + Realtime)
     LocationManager.swift        CLLocationManager wrapper
     DirectionsService.swift      MKDirections walking-route wrapper
   Stores/
-    ReportStore.swift            observable app state: reports + derived incidents
-    AuthStore.swift               observable session state: current user, login/register/logout
+    AlertStore.swift             observable app state: active alerts, reloads on Realtime change
   Views/
-    RootView.swift                shows LoginView or ContentView depending on auth state
-    ContentView.swift            tab bar: Map / Directions (+ Account, if useRemoteBackend)
-    CampusMapView.swift          the map, long-press to file a report
-    ReportSheetView.swift        report form
-    IncidentDetailView.swift     incident detail sheet
+    ContentView.swift            tab bar: Map / Directions
+    CampusMapView.swift          the map: alert geofence circles + markers
+    AlertDetailView.swift        alert detail sheet
     DirectionsView.swift         emergency route + campus destination picker
-    LoginView.swift / SignUpView.swift / AccountView.swift
 ```
 
 Open **`ios/CUAlerts.xcodeproj`** directly. In Finder, double-click it, or
@@ -46,70 +38,83 @@ plain folder as a loose file browser with no real target ("Files
 .xcfilescontainer"), which isn't buildable. Only opening the `.xcodeproj`
 item itself gives you a real project.
 
-The project targets **iOS 17** (the map code uses the iOS 17
-`Map(position:)` / `MapReader` APIs) and already has
-`NSLocationWhenInUseUsageDescription` set via the generated Info.plist —
-nothing else to configure. Pick a simulator or device and hit Run.
+The project targets **iOS 17** and already has
+`NSLocationWhenInUseUsageDescription` set via the generated Info.plist.
 
-## How the report → incident pipeline works
+## Required one-time setup: add the Supabase package
 
-- Anyone can file a `Report` (category + optional note) at a coordinate by
-  long-pressing the map.
-- `IncidentClusterer` groups reports of the same category that are within
-  **90m** and **45 minutes** of each other.
-- Once a cluster's size crosses that category's threshold
-  (`ReportCategory.incidentThreshold` — 2 for fire/crime/medical, 3 for
-  safety/suspicious/hazard, 4 for other), it becomes a visible `Incident`
-  marker on the map, colored/sized by severity.
-- Reports that haven't crossed the threshold still show as small dots, so
-  early signal isn't hidden, but it's visually distinct from a confirmed
-  incident.
+This isn't done yet — adding a Swift Package dependency means Xcode has to
+resolve it live against GitHub, which can't be done by hand-editing the
+project file reliably. Before building:
 
-## How emergency directions work
+1. In Xcode: **File → Add Package Dependencies…**
+2. Paste `https://github.com/supabase/supabase-swift`
+3. Add it to the **CUAlerts** target, with the **Supabase** product.
 
-- `DirectionsView` has an **Emergency Route** button that finds the nearest
-  emergency resource (`CampusLocation.isEmergencyResource`, e.g. CU Police,
-  Wardenburg) to the user's current location and routes to it.
-- Below that is a normal picker for any seeded campus landmark.
-- Routing uses `MKDirections` with `transportType = .walking`, returns a
-  drawn polyline plus a step list.
+Once that's done, `import Supabase` in `AlertRepository.swift` resolves
+and the project builds.
+
+## Running without a backend (default)
+
+`SupabaseConfig.url` and `.publishableKey` are blank by default, so
+`AlertStore` falls back to `OfflineAlertRepository`, which serves
+`CampusAlert.sampleAlerts` — the same three demo scenarios
+(`sample-norlin`, `sample-chem`, `sample-weather`) as
+`web/src/alerts/sampleAlerts.js`, so both clients show identical content
+when run without Supabase configured. Build and run — no server needed.
 
 ## Connecting to the real backend
 
-By default the app runs **standalone**: `AppConfig.useRemoteBackend` is
-`false`, so it uses `InMemoryReportRepository` seeded with
-`Report.sampleData` and skips login entirely — this is what you get out of
-the box, no server required.
+1. Set up Supabase per `db/README.md` (run the migration, create a
+   dispatcher account).
+2. Fill in `SupabaseConfig.url` / `.publishableKey` in
+   `ios/Sources/App/SupabaseConfig.swift` (from the Supabase dashboard →
+   Project Settings → API Keys — the publishable/anon key, never
+   `service_role`). These are placeholders, not secrets to commit as-is —
+   swap this for an untracked config (an `.xcconfig`, or a gitignored
+   `Secrets.swift`) before this handles anything real.
+3. Build and run. `AlertStore` now reads `alerts_feed` and subscribes to
+   Realtime changes on the `alerts` table — publish an alert from the web
+   dispatcher and it shows up here without a relaunch.
 
-To use the real `db/` backend instead:
+`AlertRepository.swift` mirrors `web/src/alerts/api.js` and the Swift
+snippet already in `db/README.md` — that's the documented shape of this
+client, not a guess.
 
-1. Run the backend (`cd db && npm install && npm start` — see
-   `db/README.md`).
-2. Flip `AppConfig.useRemoteBackend` to `true` in
-   `ios/Sources/App/AppConfig.swift`.
-3. Build and run. You'll land on `LoginView` first — registration requires
-   a `@colorado.edu` email (see `shared/api-contract.md`); once signed in,
-   reports are fetched from and filed against the real server, and a third
-   **Account** tab appears with a sign-out button.
+## How alerts render on the map
 
-The Simulator can reach `http://localhost:3000` directly. On a physical
-device, point `AppConfig.apiBaseURL` at your Mac's LAN IP instead of
-`localhost`.
+- Each alert draws as a `MapCircle` sized in true meters at `radius_m`
+  around its `center` — MapKit's circle overlay is natively geodesic, so
+  (unlike `web/src/alerts/geo.js`, which has to hand-compute a polygon
+  because a Mapbox GL `circle` layer is sized in pixels) no workaround is
+  needed here.
+- A marker at the center, icon by category, colored by severity (same hex
+  values as `web/src/alerts/contract.js`'s `SEVERITY_COLORS`, so severity
+  reads identically on both clients). Tap it for the full alert.
 
-Everything in `Services/` and `Stores/AuthStore.swift` talks to the
-contract in **`../shared/api-contract.md`** — that's the source of truth
-for every route and field shape.
+## How emergency directions work
+
+- `DirectionsView` has an **Emergency Route** button that finds the
+  nearest emergency resource (`CampusLocation.isEmergencyResource`, e.g.
+  CU Police, Wardenburg) to the user's current location and routes to it.
+- Below that is a normal picker for any seeded campus landmark.
+- Routing uses `MKDirections` with `transportType = .walking`, returns a
+  drawn polyline plus a step list.
+- This is independent of the alert system — it doesn't currently route
+  around active alert geofences. Worth adding once there's appetite for
+  it, since `MKDirections` doesn't support custom avoidance zones on its
+  own.
 
 ## Known gaps / next steps
 
-- Reports are unmoderated once filed — auth only proves the submitter is a
-  real CU student, it doesn't prevent spam or false reports.
-- Incident clustering still runs client-side only, against whatever
-  `GET /api/reports` returns (see "Known gaps" in `db/README.md` — moving
-  it server-side is the next step there).
-- No password reset, account deletion, or email verification flow yet.
-- Routing doesn't currently avoid areas with active incidents — worth
-  adding once there's a real routing backend, since `MKDirections` doesn't
-  support custom avoidance zones on its own.
-- Campus coordinates in `CampusLocations.swift` are approximate; swap in
-  real building data when available.
+- The web app's `MAP_STYLE` (a custom Mapbox style, see
+  `web/src/config.js`) isn't used here — this map is plain MapKit, so the
+  two clients don't currently render an identical basemap, only identical
+  alert content/colors. Matching the basemap would mean swapping MapKit
+  for the Mapbox Maps SDK for iOS, which is a separate decision (another
+  SPM dependency, plus a Mapbox access token) — flag if that's wanted.
+- No push notifications yet — the web app's `NotificationPreview.jsx`
+  shows what a notification *would* look like, but nothing sends one.
+- Campus coordinates in `CampusLocations.swift` (used only for the
+  Directions tab) are approximate; swap in real building data when
+  available.
