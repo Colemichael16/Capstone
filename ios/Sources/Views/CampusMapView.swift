@@ -2,104 +2,65 @@ import CoreLocation
 import MapKit
 import SwiftUI
 
-/// The main "Apple Maps for CU Boulder" screen: shows active incidents,
-/// lower-confidence standalone reports, and the user's own location.
-/// Long-press anywhere on the map to file a report at that spot.
+/// The main screen: active dispatcher alerts on the campus map, each drawn
+/// as a true-to-scale geofence circle (`MapCircle` is sized in real
+/// meters, unlike a Mapbox GL `circle` layer, so no custom-polygon
+/// workaround is needed here the way web/src/alerts/geo.js has one) plus a
+/// marker at its center. Tap a marker for the full alert.
 struct CampusMapView: View {
-    @EnvironmentObject private var reportStore: ReportStore
-    @EnvironmentObject private var locationManager: LocationManager
+    @EnvironmentObject private var alertStore: AlertStore
 
     @State private var cameraPosition: MapCameraPosition = .region(Campus.defaultRegion)
-    @State private var pendingReportCoordinate: CLLocationCoordinate2D?
-    @State private var selectedIncident: Incident?
+    @State private var selectedAlert: CampusAlert?
 
     var body: some View {
         NavigationStack {
-            MapReader { proxy in
-                Map(position: $cameraPosition) {
-                    UserAnnotation()
+            Map(position: $cameraPosition) {
+                UserAnnotation()
 
-                    ForEach(reportStore.incidents) { incident in
-                        Annotation(incident.category.rawValue, coordinate: incident.coordinate) {
-                            IncidentMarker(incident: incident)
-                                .onTapGesture { selectedIncident = incident }
-                        }
-                    }
+                ForEach(alertStore.alerts) { alert in
+                    MapCircle(center: alert.center, radius: Double(alert.radiusM))
+                        .foregroundStyle(alert.severity.color.opacity(0.18))
+                        .stroke(alert.severity.color, lineWidth: 2)
 
-                    ForEach(reportStore.unclusteredReports) { report in
-                        Annotation(report.category.rawValue, coordinate: report.coordinate.value) {
-                            Circle()
-                                .fill(report.category.color.opacity(0.6))
-                                .frame(width: 10, height: 10)
-                        }
-                    }
-                }
-                .mapControls {
-                    MapUserLocationButton()
-                    MapCompass()
-                }
-                .gesture(
-                    LongPressGesture(minimumDuration: 0.4)
-                        .sequenced(before: DragGesture(minimumDistance: 0))
-                        .onEnded { value in
-                            guard case .second(true, let drag?) = value else { return }
-                            if let coordinate = proxy.convert(drag.location, from: .local) {
-                                pendingReportCoordinate = coordinate
-                            }
-                        }
-                )
-            }
-            .sheet(item: $selectedIncident) { incident in
-                IncidentDetailView(incident: incident)
-            }
-            .sheet(isPresented: Binding(
-                get: { pendingReportCoordinate != nil },
-                set: { if !$0 { pendingReportCoordinate = nil } }
-            )) {
-                if let coordinate = pendingReportCoordinate {
-                    ReportSheetView(coordinate: coordinate) {
-                        pendingReportCoordinate = nil
+                    Annotation(alert.headline, coordinate: alert.center) {
+                        AlertMarker(alert: alert)
+                            .onTapGesture { selectedAlert = alert }
                     }
                 }
             }
-            .overlay(alignment: .bottom) {
-                Text("Press and hold a spot on the map to file a report")
-                    .font(.footnote)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(.thinMaterial, in: Capsule())
-                    .padding(.bottom, 12)
+            .mapControls {
+                MapUserLocationButton()
+                MapCompass()
             }
+            .sheet(item: $selectedAlert) { alert in
+                AlertDetailView(alert: alert)
+            }
+            .overlay {
+                if alertStore.alerts.isEmpty && !alertStore.isLoading {
+                    ContentUnavailableView(
+                        "No Active Alerts",
+                        systemImage: "checkmark.shield",
+                        description: Text("You'll see official campus alerts here as they're issued.")
+                    )
+                }
+            }
+        }
+        .task {
+            await alertStore.start()
         }
     }
 }
 
-private struct IncidentMarker: View {
-    let incident: Incident
+private struct AlertMarker: View {
+    let alert: CampusAlert
 
     var body: some View {
-        VStack(spacing: 2) {
-            Image(systemName: incident.category.systemImage)
-                .font(.headline)
-                .foregroundStyle(.white)
-                .padding(8)
-                .background(color, in: Circle())
-                .overlay(Circle().stroke(.white, lineWidth: 2))
-            Text("\(incident.reportCount)")
-                .font(.caption2.bold())
-                .padding(.horizontal, 6)
-                .padding(.vertical, 1)
-                .background(color, in: Capsule())
-                .foregroundStyle(.white)
-        }
-    }
-
-    private var color: Color {
-        switch incident.severity {
-        case .low: return .yellow
-        case .moderate: return .orange
-        case .high: return .red
-        case .critical: return .purple
-        }
+        Image(systemName: alert.category.systemImage)
+            .font(.headline)
+            .foregroundStyle(.white)
+            .padding(8)
+            .background(alert.severity.color, in: Circle())
+            .overlay(Circle().stroke(.white, lineWidth: 2))
     }
 }
