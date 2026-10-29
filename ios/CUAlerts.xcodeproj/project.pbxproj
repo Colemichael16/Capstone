@@ -28,6 +28,7 @@
 		8A38F5A764874B00B519F8A7 /* AlertsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782BE06CC5B74FB485AA106D /* AlertsListView.swift */; };
 		2ED83FE47DD94B8FB988534A /* LocalInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A9805BA7024E198A4C8FF7 /* LocalInfoView.swift */; };
 		B155AD94C54D410081743E41 /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 246E89C1E9014EDCA647F9CA /* MoreView.swift */; };
+		6AEF0D0D55554A05A204AF8B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 710315251E024A498B1D1906 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,7 @@
 		782BE06CC5B74FB485AA106D /* AlertsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsListView.swift; sourceTree = "<group>"; };
 		93A9805BA7024E198A4C8FF7 /* LocalInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalInfoView.swift; sourceTree = "<group>"; };
 		246E89C1E9014EDCA647F9CA /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
+		710315251E024A498B1D1906 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +140,7 @@
 				043C3D2B2D5C4441BE8806F7 /* Data */,
 				5DC6B3843BCC4142888413AC /* Services */,
 				A8B2120BAD644AE794767833 /* Views */,
+				710315251E024A498B1D1906 /* Assets.xcassets */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -216,6 +219,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6AEF0D0D55554A05A204AF8B /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -367,7 +371,9 @@
 		16F52B70EBD34CB5883681B7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -396,7 +402,9 @@
 		5304D905AF3D45B6B3B9459C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";

@@ -40,13 +40,16 @@ struct AlertDetailView: View {
 
                     miniMap
                         .frame(height: 180)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .subtleShadow()
 
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: 8) {
                         LabeledContent("Issued", value: alert.issuedAt.formatted(date: .omitted, time: .shortened))
                         LabeledContent("Expires", value: alert.expiresAt.formatted(date: .omitted, time: .shortened))
                     }
                     .font(.footnote)
+                    .padding(14)
+                    .cardStyle(cornerRadius: 12)
                 }
                 .padding()
             }
@@ -61,9 +64,14 @@ struct AlertDetailView: View {
     }
 
     private var statusBanner: some View {
-        HStack(spacing: 10) {
-            Image(systemName: alert.category.systemImage)
-                .font(.title3)
+        HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(.white.opacity(0.18))
+                    .frame(width: 40, height: 40)
+                Image(systemName: alert.category.systemImage)
+                    .font(.headline)
+            }
             VStack(alignment: .leading, spacing: 2) {
                 Text(alert.headline)
                     .font(.subheadline.bold())
@@ -74,7 +82,8 @@ struct AlertDetailView: View {
         }
         .foregroundStyle(.white)
         .padding(14)
-        .background(alert.severity.color, in: RoundedRectangle(cornerRadius: 12))
+        .background(Theme.gradient(for: alert.severity.color), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .shadow(color: alert.severity.color.opacity(0.3), radius: 12, x: 0, y: 6)
     }
 
     private var miniMap: some View {

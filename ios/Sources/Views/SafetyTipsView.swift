@@ -13,18 +13,31 @@ struct SafetyTipsView: View {
 
     var body: some View {
         NavigationStack {
-            List(tips, id: \.title) { tip in
-                Label {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(tip.title).font(.headline)
-                        Text(tip.body).font(.footnote).foregroundStyle(.secondary)
+            ScrollView {
+                VStack(spacing: 12) {
+                    ForEach(tips, id: \.title) { tip in
+                        HStack(alignment: .top, spacing: 14) {
+                            ZStack {
+                                Circle()
+                                    .fill(Theme.goldGradient)
+                                    .frame(width: 40, height: 40)
+                                Image(systemName: tip.systemImage)
+                                    .font(.subheadline.bold())
+                                    .foregroundStyle(Theme.cuBlack)
+                            }
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(tip.title).font(.subheadline.bold())
+                                Text(tip.body).font(.footnote).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                        }
+                        .padding(14)
+                        .cardStyle()
                     }
-                } icon: {
-                    Image(systemName: tip.systemImage)
-                        .foregroundStyle(Theme.cuGold)
                 }
-                .padding(.vertical, 4)
+                .padding()
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("Safety Tips")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
