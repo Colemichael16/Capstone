@@ -74,12 +74,27 @@ The UI follows the mockups in the team's project update deck: a
 **RegentWatch**-branded home screen with a prominent alert banner and a
 2×2 quick-access grid, a dedicated Alerts list, a Campus Map with a
 search bar and All/Alerts/Safe Zones/Resources filter pills, and a
-Local Information screen (Events/Resources/Safety Tips). CU brand colors
-(gold `#CFB87C`, black) are in `Theme.swift`. One deliberate deviation:
-the deck's "Report" quick-access button was repurposed as **Directions**
-— there's no citizen-reporting feature in this app (alerts are
-dispatcher-issued only), so the original "Report" slot would have gone to
-nothing.
+Local Information screen (Events/Resources/Safety Tips). One deliberate
+deviation: the deck's "Report" quick-access button was repurposed as
+**Directions** — there's no citizen-reporting feature in this app (alerts
+are dispatcher-issued only), so the original "Report" slot would have
+gone to nothing.
+
+**App icon:** `Assets.xcassets/AppIcon.appiconset` — a gold shield-and-bell
+mark on a dark background, generated programmatically (no AI image tool
+was available), not a reproduction of CU Boulder's official block-C/
+interlocking-CU marks. Swap it for real brand artwork before this ships
+anywhere official. `AccentColor` is set to CU gold as the system-wide
+default tint.
+
+**Visual system** (`Theme.swift`): every icon badge, button, pill, and
+banner uses a gradient fill (`Theme.gradient(for:)`, a 2-stop vertical
+gradient of whatever base color) rather than a flat fill, and every
+card-like surface uses `.cardStyle()` (background + soft shadow) via a
+shared `View` extension — that's what keeps Home/Alerts/Map/More/Local
+Info/Safety Tips reading as one system instead of each screen inventing
+its own look. `Theme.goldGradient` is the CU-gold version used for
+brand-specific elements (the header badge, safety tip icons).
 
 ## Running without a backend (default)
 
@@ -147,9 +162,9 @@ client, not a guess.
   alert content/colors. Matching the basemap would mean swapping MapKit
   for the Mapbox Maps SDK for iOS, which is a separate decision (another
   SPM dependency, plus a Mapbox access token) — flag if that's wanted.
-- No actual CU logo asset — the home screen header is text-only
-  ("Regent" in black, "Watch" in gold). Needs a real app icon and logo
-  image before this ships.
+- The app icon and in-app logo badge are an original placeholder mark
+  (gold shield + bell), not CU Boulder's real branding — needs actual
+  brand artwork before this ships anywhere official.
 - No push notifications yet — the web app's `NotificationPreview.jsx`
   shows what a notification *would* look like, but nothing sends one.
 - Campus coordinates in `CampusLocations.swift` are approximate; swap in

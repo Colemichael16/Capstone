@@ -28,7 +28,7 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 24) {
                     header
 
                     if let headlineAlert {
@@ -42,6 +42,7 @@ struct HomeView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 24)
             }
+            .background(Color(.systemGroupedBackground))
             .navigationBarHidden(true)
             .sheet(item: $selectedAlert) { alert in
                 AlertDetailView(alert: alert)
@@ -53,18 +54,28 @@ struct HomeView: View {
     }
 
     private var header: some View {
-        HStack {
+        HStack(spacing: 10) {
+            ZStack {
+                Circle()
+                    .fill(Theme.goldGradient)
+                    .frame(width: 40, height: 40)
+                Image(systemName: "bell.badge.fill")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(Theme.cuBlack)
+            }
+            .subtleShadow()
+
             HStack(spacing: 6) {
                 Text("Regent")
                     .foregroundStyle(Theme.cuBlack)
                 Text("Watch")
-                    .foregroundStyle(Theme.cuGold)
+                    .foregroundStyle(Theme.cuGoldDark)
             }
             .font(.title2.bold())
 
             Spacer()
 
-            Image(systemName: "gearshape")
+            Image(systemName: "gearshape.fill")
                 .font(.title3)
                 .foregroundStyle(.secondary)
         }
@@ -72,10 +83,15 @@ struct HomeView: View {
     }
 
     private var allClearBanner: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "checkmark.shield.fill")
-                .font(.title2)
-                .foregroundStyle(Theme.safeZone)
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(Theme.gradient(for: Theme.safeZone))
+                    .frame(width: 48, height: 48)
+                Image(systemName: "checkmark.shield.fill")
+                    .font(.title3)
+                    .foregroundStyle(.white)
+            }
             VStack(alignment: .leading, spacing: 2) {
                 Text("No Active Alerts")
                     .font(.headline)
@@ -85,22 +101,22 @@ struct HomeView: View {
             }
             Spacer()
         }
-        .padding()
-        .background(Theme.safeZone.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
+        .padding(16)
+        .cardStyle(fill: Theme.safeZone.opacity(0.08))
     }
 
     private var quickAccessGrid: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-            QuickAccessButton(title: "Campus Map", systemImage: "map.fill") {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 14) {
+            QuickAccessButton(title: "Campus Map", systemImage: "map.fill", tint: Theme.resource) {
                 selectedTab = .map
             }
-            QuickAccessButton(title: "Safety Tips", systemImage: "checkmark.shield") {
+            QuickAccessButton(title: "Safety Tips", systemImage: "checkmark.shield.fill", tint: Theme.safeZone) {
                 showingSafetyTips = true
             }
-            QuickAccessButton(title: "Directions", systemImage: "arrow.triangle.turn.up.right.diamond.fill") {
+            QuickAccessButton(title: "Directions", systemImage: "arrow.triangle.turn.up.right.diamond.fill", tint: Theme.cuGoldDark) {
                 selectedTab = .more
             }
-            QuickAccessButton(title: "Resources", systemImage: "info.circle.fill") {
+            QuickAccessButton(title: "Resources", systemImage: "info.circle.fill", tint: Theme.resource) {
                 selectedTab = .more
             }
         }
@@ -128,16 +144,17 @@ private struct AlertBanner: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("EMERGENCY ALERT")
                         .font(.caption.bold())
+                        .tracking(0.5)
                     Text(alert.headline)
                         .font(.subheadline.bold())
                 }
                 Spacer()
             }
             .foregroundStyle(.white)
-            .padding(14)
-            .background(alert.severity.color)
+            .padding(16)
+            .background(Theme.gradient(for: alert.severity.color))
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 10) {
                 Text(alert.shortMessage)
                     .font(.subheadline)
                     .foregroundStyle(.primary)
@@ -145,35 +162,48 @@ private struct AlertBanner: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
-                Button("View Details →", action: onViewDetails)
+                Button(action: onViewDetails) {
+                    HStack(spacing: 4) {
+                        Text("View Details")
+                        Image(systemName: "arrow.right")
+                    }
                     .font(.subheadline.bold())
-                    .foregroundStyle(alert.severity.color)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(alert.severity.color)
             }
-            .padding(14)
-            .background(alert.severity.color.opacity(0.1))
+            .padding(16)
+            .background(Color(.secondarySystemBackground))
         }
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .shadow(color: alert.severity.color.opacity(0.25), radius: 16, x: 0, y: 8)
     }
 }
 
 private struct QuickAccessButton: View {
     let title: String
     let systemImage: String
+    let tint: Color
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
-                Image(systemName: systemImage)
-                    .font(.title2)
-                    .foregroundStyle(Theme.cuGold)
+            VStack(spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill(Theme.gradient(for: tint))
+                        .frame(width: 48, height: 48)
+                    Image(systemName: systemImage)
+                        .font(.system(size: 19, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
                 Text(title)
                     .font(.subheadline.bold())
                     .foregroundStyle(.primary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
-            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14))
+            .padding(.vertical, 22)
+            .cardStyle(cornerRadius: 16)
         }
         .buttonStyle(.plain)
     }

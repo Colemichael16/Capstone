@@ -101,8 +101,8 @@ struct CampusMapView: View {
                     .foregroundStyle(.secondary)
                 TextField("Search buildings, events, or alerts…", text: $searchText)
             }
-            .padding(10)
-            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
+            .padding(12)
+            .cardStyle(cornerRadius: 12)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
@@ -116,7 +116,8 @@ struct CampusMapView: View {
         }
         .padding(.horizontal)
         .padding(.top, 8)
-        .padding(.bottom, 10)
+        .padding(.bottom, 14)
+        .background(Color(.systemBackground))
     }
 
     private func tint(for filter: MapFilter) -> Color {
@@ -141,8 +142,9 @@ private struct FilterPill: View {
                 .font(.subheadline.bold())
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
-                .background(isSelected ? tint : Color(.secondarySystemBackground), in: Capsule())
+                .background(isSelected ? AnyShapeStyle(Theme.gradient(for: tint)) : AnyShapeStyle(Color(.secondarySystemBackground)), in: Capsule())
                 .foregroundStyle(isSelected ? .white : .primary)
+                .shadow(color: isSelected ? tint.opacity(0.3) : .clear, radius: 6, x: 0, y: 3)
         }
         .buttonStyle(.plain)
     }
@@ -156,8 +158,9 @@ private struct AlertMarker: View {
             .font(.headline)
             .foregroundStyle(.white)
             .padding(8)
-            .background(alert.severity.color, in: Circle())
+            .background(Theme.gradient(for: alert.severity.color), in: Circle())
             .overlay(Circle().stroke(.white, lineWidth: 2))
+            .shadow(color: alert.severity.color.opacity(0.4), radius: 6, x: 0, y: 3)
     }
 }
 
@@ -169,7 +172,8 @@ private struct LocationMarker: View {
             .font(.caption)
             .foregroundStyle(.white)
             .padding(6)
-            .background(location.category.color, in: Circle())
+            .background(Theme.gradient(for: location.category.color), in: Circle())
             .overlay(Circle().stroke(.white, lineWidth: 1.5))
+            .shadow(color: location.category.color.opacity(0.35), radius: 4, x: 0, y: 2)
     }
 }

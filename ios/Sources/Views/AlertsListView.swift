@@ -21,15 +21,20 @@ struct AlertsListView: View {
                         description: Text("You'll see official campus alerts here as they're issued.")
                     )
                 } else {
-                    List(sortedAlerts) { alert in
-                        Button {
-                            selectedAlert = alert
-                        } label: {
-                            AlertRow(alert: alert)
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            ForEach(sortedAlerts) { alert in
+                                Button {
+                                    selectedAlert = alert
+                                } label: {
+                                    AlertRow(alert: alert)
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
-                        .buttonStyle(.plain)
+                        .padding()
                     }
-                    .listStyle(.plain)
+                    .background(Color(.systemGroupedBackground))
                     .refreshable {
                         await alertStore.load()
                     }
@@ -47,12 +52,15 @@ private struct AlertRow: View {
     let alert: CampusAlert
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: alert.category.systemImage)
-                .font(.headline)
-                .foregroundStyle(.white)
-                .padding(8)
-                .background(alert.severity.color, in: Circle())
+        HStack(alignment: .top, spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(Theme.gradient(for: alert.severity.color))
+                    .frame(width: 44, height: 44)
+                Image(systemName: alert.category.systemImage)
+                    .font(.headline)
+                    .foregroundStyle(.white)
+            }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(alert.headline)
@@ -67,8 +75,13 @@ private struct AlertRow: View {
             }
 
             Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.caption.bold())
+                .foregroundStyle(.tertiary)
         }
-        .padding(.vertical, 6)
+        .padding(14)
+        .cardStyle()
     }
 }
 
