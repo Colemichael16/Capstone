@@ -20,6 +20,14 @@
 		CE5C663D6F43408681C5612D /* AlertRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58888EA2B9F14F4BA22E3BDC /* AlertRepository.swift */; };
 		710BECB7F1714E6DB6D1FDF7 /* AlertStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0777E49B99A9477D9CB80B94 /* AlertStore.swift */; };
 		11868FFD98824C7C834ED86E /* AlertDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FA896770E4458196AF2501 /* AlertDetailView.swift */; };
+		82BEFF65FF8B4AC6A68C836A /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F0CEFAE19A4AFDA62E3856 /* Theme.swift */; };
+		647FFCD1A91A4322A08586D4 /* LocalInfoSamples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE1F8B97A4F4911AE86F9AC /* LocalInfoSamples.swift */; };
+		A6F5C95A50BF4C169C1CF5DE /* LocalInfoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6BBBC1020A460EADCE8897 /* LocalInfoItem.swift */; };
+		E4DAD6B0B8674127965EA63F /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16621D35A88A4385ABB172B9 /* HomeView.swift */; };
+		009E270BE8E9434794C99CF2 /* SafetyTipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A355599FF86439AB83EA639 /* SafetyTipsView.swift */; };
+		8A38F5A764874B00B519F8A7 /* AlertsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782BE06CC5B74FB485AA106D /* AlertsListView.swift */; };
+		2ED83FE47DD94B8FB988534A /* LocalInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A9805BA7024E198A4C8FF7 /* LocalInfoView.swift */; };
+		B155AD94C54D410081743E41 /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 246E89C1E9014EDCA647F9CA /* MoreView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +45,14 @@
 		58888EA2B9F14F4BA22E3BDC /* AlertRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertRepository.swift; sourceTree = "<group>"; };
 		0777E49B99A9477D9CB80B94 /* AlertStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertStore.swift; sourceTree = "<group>"; };
 		A3FA896770E4458196AF2501 /* AlertDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertDetailView.swift; sourceTree = "<group>"; };
+		41F0CEFAE19A4AFDA62E3856 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		0CE1F8B97A4F4911AE86F9AC /* LocalInfoSamples.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalInfoSamples.swift; sourceTree = "<group>"; };
+		BE6BBBC1020A460EADCE8897 /* LocalInfoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalInfoItem.swift; sourceTree = "<group>"; };
+		16621D35A88A4385ABB172B9 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		9A355599FF86439AB83EA639 /* SafetyTipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafetyTipsView.swift; sourceTree = "<group>"; };
+		782BE06CC5B74FB485AA106D /* AlertsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsListView.swift; sourceTree = "<group>"; };
+		93A9805BA7024E198A4C8FF7 /* LocalInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalInfoView.swift; sourceTree = "<group>"; };
+		246E89C1E9014EDCA647F9CA /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +71,7 @@
 			children = (
 				19833FC434814F8EBDB3C7B9 /* CUAlertsApp.swift */,
 				BC2562A4F5F74D678489F03C /* SupabaseConfig.swift */,
+				41F0CEFAE19A4AFDA62E3856 /* Theme.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -64,6 +81,7 @@
 			children = (
 				F28AC2A1E313486FA34EE6A1 /* CampusLocations.swift */,
 				5C92196D5AD34C18A5BF0F31 /* SampleAlerts.swift */,
+				0CE1F8B97A4F4911AE86F9AC /* LocalInfoSamples.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -85,6 +103,11 @@
 				816EA2B875CC4A2D95D2FA8D /* ContentView.swift */,
 				282295D483234CACBEFD05CD /* DirectionsView.swift */,
 				A3FA896770E4458196AF2501 /* AlertDetailView.swift */,
+				16621D35A88A4385ABB172B9 /* HomeView.swift */,
+				9A355599FF86439AB83EA639 /* SafetyTipsView.swift */,
+				782BE06CC5B74FB485AA106D /* AlertsListView.swift */,
+				93A9805BA7024E198A4C8FF7 /* LocalInfoView.swift */,
+				246E89C1E9014EDCA647F9CA /* MoreView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -93,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				EA37717DF13F455EA4581A91 /* Alert.swift */,
+				BE6BBBC1020A460EADCE8897 /* LocalInfoItem.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -215,6 +239,14 @@
 				CE5C663D6F43408681C5612D /* AlertRepository.swift in Sources */,
 				710BECB7F1714E6DB6D1FDF7 /* AlertStore.swift in Sources */,
 				11868FFD98824C7C834ED86E /* AlertDetailView.swift in Sources */,
+				82BEFF65FF8B4AC6A68C836A /* Theme.swift in Sources */,
+				647FFCD1A91A4322A08586D4 /* LocalInfoSamples.swift in Sources */,
+				A6F5C95A50BF4C169C1CF5DE /* LocalInfoItem.swift in Sources */,
+				E4DAD6B0B8674127965EA63F /* HomeView.swift in Sources */,
+				009E270BE8E9434794C99CF2 /* SafetyTipsView.swift in Sources */,
+				8A38F5A764874B00B519F8A7 /* AlertsListView.swift in Sources */,
+				2ED83FE47DD94B8FB988534A /* LocalInfoView.swift in Sources */,
+				B155AD94C54D410081743E41 /* MoreView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -341,6 +373,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = RegentWatch;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Used to show your position on the campus map and calculate walking directions.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -369,6 +402,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = RegentWatch;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Used to show your position on the campus map and calculate walking directions.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

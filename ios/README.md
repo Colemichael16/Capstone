@@ -1,9 +1,12 @@
-# CU Alerts (iOS)
+# RegentWatch (iOS)
 
 SwiftUI client for the dispatcher alert system: campus staff publish
 official alerts from the web app (`web/`), and this app shows them on a
 live campus map plus gives walking directions across campus. iOS never
 creates or edits an alert — that's the web dispatcher's job.
+
+Branded **RegentWatch** (CFBundleDisplayName) per the project deck, though
+the Xcode project/target is still named `CUAlerts` internally.
 
 ## What's here
 
@@ -13,11 +16,14 @@ ios/Sources/
   App/
     CUAlertsApp.swift            entry point, wires up stores
     SupabaseConfig.swift         Supabase URL/key — blank by default (offline mode)
+    Theme.swift                  CU brand colors (gold/black) + safe-zone/resource colors
   Models/
     Alert.swift                  CampusAlert + its enums, matches shared/alert.schema.json
+    LocalInfoItem.swift          row model for the Local Information screen
   Data/
-    CampusLocations.swift        seed campus landmarks + emergency resources (for Directions)
+    CampusLocations.swift        seed campus landmarks, categorized safeZone/resource
     SampleAlerts.swift           offline demo alerts, mirrors web/src/alerts/sampleAlerts.js
+    LocalInfoSamples.swift       static Events/Resources/Safety Tips content
   Services/
     AlertRepository.swift        OfflineAlertRepository + SupabaseAlertRepository (alerts_feed + Realtime)
     LocationManager.swift        CLLocationManager wrapper
@@ -25,9 +31,14 @@ ios/Sources/
   Stores/
     AlertStore.swift             observable app state: active alerts, reloads on Realtime change
   Views/
-    ContentView.swift            tab bar: Map / Directions
-    CampusMapView.swift          the map: alert geofence circles + markers
-    AlertDetailView.swift        alert detail sheet
+    ContentView.swift            4-tab bar: Home / Alerts / Map / More
+    HomeView.swift                headline alert banner + quick-access grid
+    AlertsListView.swift          every active alert as a scannable list
+    CampusMapView.swift          the map: alert geofences, safe-zone/resource pins, search + filter
+    AlertDetailView.swift        alert detail sheet ("What is happening?" / "What should I do?")
+    MoreView.swift                menu: Directions, Local Information
+    LocalInfoView.swift          Events / Resources / Safety Tips, segmented
+    SafetyTipsView.swift         static safety tips sheet
     DirectionsView.swift         emergency route + campus destination picker
 ```
 
@@ -51,8 +62,24 @@ project file reliably. Before building:
 2. Paste `https://github.com/supabase/supabase-swift`
 3. Add it to the **CUAlerts** target, with the **Supabase** product.
 
-Once that's done, `import Supabase` in `AlertRepository.swift` resolves
-and the project builds.
+If you still see "No such module 'Supabase'" after that, it's almost
+always that the package got added to the *project* but not linked to the
+*target*: select the **CUAlerts** target → **General** → **Frameworks,
+Libraries, and Embedded Content** → **+** → add **Supabase** there too,
+then **Product → Clean Build Folder** (⇧⌘K) and rebuild.
+
+## Design direction
+
+The UI follows the mockups in the team's project update deck: a
+**RegentWatch**-branded home screen with a prominent alert banner and a
+2×2 quick-access grid, a dedicated Alerts list, a Campus Map with a
+search bar and All/Alerts/Safe Zones/Resources filter pills, and a
+Local Information screen (Events/Resources/Safety Tips). CU brand colors
+(gold `#CFB87C`, black) are in `Theme.swift`. One deliberate deviation:
+the deck's "Report" quick-access button was repurposed as **Directions**
+— there's no citizen-reporting feature in this app (alerts are
+dispatcher-issued only), so the original "Report" slot would have gone to
+nothing.
 
 ## Running without a backend (default)
 
@@ -91,12 +118,16 @@ client, not a guess.
 - A marker at the center, icon by category, colored by severity (same hex
   values as `web/src/alerts/contract.js`'s `SEVERITY_COLORS`, so severity
   reads identically on both clients). Tap it for the full alert.
+- Safe zones (CU Police, Wardenburg) and everyday resources (library,
+  UMC, etc.) from `CampusLocations.swift` show as green/blue pins, and the
+  filter pills toggle each layer — matches the map pin legend in the deck.
 
 ## How emergency directions work
 
-- `DirectionsView` has an **Emergency Route** button that finds the
-  nearest emergency resource (`CampusLocation.isEmergencyResource`, e.g.
-  CU Police, Wardenburg) to the user's current location and routes to it.
+- `DirectionsView` (under the **More** tab) has an **Emergency Route**
+  button that finds the nearest safe zone (`CampusLocation.category ==
+  .safeZone`, e.g. CU Police, Wardenburg) to the user's current location
+  and routes to it.
 - Below that is a normal picker for any seeded campus landmark.
 - Routing uses `MKDirections` with `transportType = .walking`, returns a
   drawn polyline plus a step list.
@@ -107,14 +138,19 @@ client, not a guess.
 
 ## Known gaps / next steps
 
+- **Local Information is static sample content** (`LocalInfoSamples.swift`)
+  — campus closures, events, weather, transit. There's no real data
+  source behind any of it yet.
 - The web app's `MAP_STYLE` (a custom Mapbox style, see
   `web/src/config.js`) isn't used here — this map is plain MapKit, so the
   two clients don't currently render an identical basemap, only identical
   alert content/colors. Matching the basemap would mean swapping MapKit
   for the Mapbox Maps SDK for iOS, which is a separate decision (another
   SPM dependency, plus a Mapbox access token) — flag if that's wanted.
+- No actual CU logo asset — the home screen header is text-only
+  ("Regent" in black, "Watch" in gold). Needs a real app icon and logo
+  image before this ships.
 - No push notifications yet — the web app's `NotificationPreview.jsx`
   shows what a notification *would* look like, but nothing sends one.
-- Campus coordinates in `CampusLocations.swift` (used only for the
-  Directions tab) are approximate; swap in real building data when
-  available.
+- Campus coordinates in `CampusLocations.swift` are approximate; swap in
+  real building data when available.

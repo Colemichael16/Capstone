@@ -1,14 +1,27 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        TabView {
-            CampusMapView()
-                .tabItem { Label("Campus Map", systemImage: "map.fill") }
+    @State private var selectedTab: AppTab = .home
 
-            DirectionsView()
-                .tabItem { Label("Directions", systemImage: "arrow.triangle.turn.up.right.diamond.fill") }
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            HomeView(selectedTab: $selectedTab)
+                .tabItem { Label("Home", systemImage: "house.fill") }
+                .tag(AppTab.home)
+
+            AlertsListView()
+                .tabItem { Label("Alerts", systemImage: "bell.fill") }
+                .tag(AppTab.alerts)
+
+            CampusMapView()
+                .tabItem { Label("Map", systemImage: "map.fill") }
+                .tag(AppTab.map)
+
+            MoreView()
+                .tabItem { Label("More", systemImage: "ellipsis") }
+                .tag(AppTab.more)
         }
+        .tint(Theme.cuGold)
     }
 }
 

@@ -16,84 +16,84 @@ struct DirectionsView: View {
     @State private var cameraPosition: MapCameraPosition = .region(Campus.defaultRegion)
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                Map(position: $cameraPosition) {
-                    UserAnnotation()
+        VStack(spacing: 0) {
+            Map(position: $cameraPosition) {
+                UserAnnotation()
 
-                    if let destination {
-                        Marker(destination.name, coordinate: destination.coordinate)
-                    }
+                if let destination {
+                    Marker(destination.name, coordinate: destination.coordinate)
+                }
 
-                    if let route {
-                        MapPolyline(route.polyline)
-                            .stroke(.blue, lineWidth: 5)
+                if let route {
+                    MapPolyline(route.polyline)
+                        .stroke(Theme.cuGold, lineWidth: 5)
+                }
+            }
+            .frame(height: 280)
+
+            List {
+                Section {
+                    Button {
+                        routeToNearestSafeZone()
+                    } label: {
+                        Label("Emergency Route: nearest help", systemImage: "sos")
+                            .foregroundStyle(.red)
+                            .fontWeight(.semibold)
                     }
                 }
-                .frame(height: 280)
 
-                List {
-                    Section {
+                Section("Or pick a destination") {
+                    ForEach(Campus.locations) { location in
                         Button {
-                            routeToNearestEmergencyResource()
+                            destination = location
+                            Task { await calculateRoute(to: location) }
                         } label: {
-                            Label("Emergency Route: nearest help", systemImage: "sos")
-                                .foregroundStyle(.red)
-                                .fontWeight(.semibold)
-                        }
-                    }
-
-                    Section("Or pick a destination") {
-                        ForEach(Campus.locations) { location in
-                            Button {
-                                destination = location
-                                Task { await calculateRoute(to: location) }
-                            } label: {
-                                VStack(alignment: .leading) {
-                                    Text(location.name).foregroundStyle(.primary)
-                                    Text(location.subtitle)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
+                            VStack(alignment: .leading) {
+                                Text(location.name).foregroundStyle(.primary)
+                                Text(location.subtitle)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
+                }
 
-                    if let route {
-                        Section("Route") {
-                            LabeledContent("Distance", value: distanceLabel(route.distanceMeters))
-                            LabeledContent("Walking time", value: durationLabel(route.expectedTravelTime))
-                        }
+                if let route {
+                    Section("Route") {
+                        LabeledContent("Distance", value: distanceLabel(route.distanceMeters))
+                        LabeledContent("Walking time", value: durationLabel(route.expectedTravelTime))
+                    }
 
-                        Section("Steps") {
-                            ForEach(Array(route.steps.enumerated()), id: \.offset) { _, step in
-                                if !step.instructions.isEmpty {
-                                    Text(step.instructions)
-                                }
+                    Section("Steps") {
+                        ForEach(Array(route.steps.enumerated()), id: \.offset) { _, step in
+                            if !step.instructions.isEmpty {
+                                Text(step.instructions)
                             }
                         }
                     }
+                }
 
-                    if isLoading {
-                        ProgressView("Finding route…")
-                    }
+                if isLoading {
+                    ProgressView("Finding route…")
+                }
 
-                    if let errorMessage {
-                        Text(errorMessage)
-                            .foregroundStyle(.red)
-                            .font(.footnote)
-                    }
+                if let errorMessage {
+                    Text(errorMessage)
+                        .foregroundStyle(.red)
+                        .font(.footnote)
                 }
             }
         }
+        .navigationTitle("Directions")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
-    private func routeToNearestEmergencyResource() {
+    private func routeToNearestSafeZone() {
         guard let origin = locationManager.coordinate else {
             errorMessage = "Turn on location access to use emergency routing."
             return
         }
-        guard let nearest = Campus.nearestEmergencyResource(to: origin) else { return }
+        guard let nearest = Campus.nearestSafeZone(to: origin) else { return }
         destination = nearest
         Task { await calculateRoute(to: nearest) }
     }
