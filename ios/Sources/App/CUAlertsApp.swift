@@ -12,6 +12,7 @@ struct CUAlertsApp: App {
                 .environmentObject(locationManager)
                 .task {
                     locationManager.requestPermission()
+                    await alertStore.start()
                 }
         }
     }
